@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title><%= problem.title %> | DSA Focus</title>
+
+<link rel="stylesheet" href="/style.css">
+```
+
+</head>
+
+<body>
+
+```
+<h1><%= problem.title %></h1>
+
+<p>
+    <strong>Difficulty:</strong>
+    <%= problem.difficulty %>
+</p>
+
+<p>
+    <strong>Topic:</strong>
+    <%= problem.topic || "Not specified" %>
+</p>
+
+<p>
+    <strong>Platform:</strong>
+    <%= problem.platform || "Not specified" %>
+</p>
+
+<% if (problem.problem_url) { %>
+
+    <p>
+        <a
+            href="<%= problem.problem_url %>"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Open Problem
+        </a>
+    </p>
+
+<% } %>
+
+<hr>
+
+<h2>Your Statistics</h2>
+
+<p>
+    Total Attempts:
+    <strong>
+        <%= stats.totalAttempts || 0 %>
+    </strong>
+</p>
+
+<p>
+    Solved:
+    <strong>
+        <%= stats.solvedAttempts || 0 %>
+    </strong>
+</p>
+
+<p>
+    Failed:
+    <strong>
+        <%= stats.failedAttempts || 0 %>
+    </strong>
+</p>
+
+<p>
+    Revision Attempts:
+    <strong>
+        <%= stats.revisionAttempts || 0 %>
+    </strong>
+</p>
+
+<p>
+    Best Time:
+
+    <% if (stats.bestTime !== null) { %>
+
+        <strong>
+            <%= Math.floor(stats.bestTime / 60) %>
+            min
+            <%= stats.bestTime % 60 %>
+            sec
+        </strong>
+
+    <% } else { %>
+
+        <strong>
+            Not solved yet
+        </strong>
+
+    <% } %>
+
+</p>
+
+<hr>
+
+<h2>Attempt History</h2>
+
+<% if (history.length === 0) { %>
+
+    <p>
+        No completed attempts yet.
+    </p>
+
+<% } else { %>
+
+    <% history.forEach((session) => { %>
+
+        <div>
+
+            <h3>
+
+                <% if (session.session_type === "revision") { %>
+
+                    Revision
+
+                <% } else { %>
+
+                    Initial Attempt
+
+                <% } %>
+
+            </h3>
+
+            <% if (session.result === "solved") { %>
+
+                <p>
+                    ✓ Solved
+                </p>
+
+            <% } else if (session.result === "expired") { %>
+
+                <p>
+                    ⏱ Time Expired
+                </p>
+
+            <% } else { %>
+
+                <p>
+                    ✗ Couldn't Solve
+                </p>
+
+            <% } %>
+
+            <p>
+                Allowed Time:
+                <%= session.allowed_minutes %> minutes
+            </p>
+
+            <% if (session.time_taken_seconds !== null) { %>
+
+                <p>
+                    Time Taken:
+
+                    <%= Math.floor(
+                        session.time_taken_seconds / 60
+                    ) %>
+
+                    min
+
+                    <%= session.time_taken_seconds % 60 %>
+
+                    sec
+                </p>
+
+            <% } %>
+
+            <p>
+                Started:
+                <%= session.started_at %>
+            </p>
+
+        </div>
+
+        <hr>
+
+    <% }) %>
+
+<% } %>
+
+<h2>Recommended Time</h2>
+
+<% if (problem.difficulty === "easy") { %>
+
+    <p>
+        25 minutes
+    </p>
+
+<% } else if (problem.difficulty === "medium") { %>
+
+    <p>
+        45 minutes
+    </p>
+
+<% } else { %>
+
+    <p>
+        60 minutes
+    </p>
+
+<% } %>
+
+<br>
+
+<a href="/problems/<%= problem.id %>/start">
+    <button type="button">
+        Start Solving
+    </button>
+</a>
+
+<br><br>
+
+<a href="/problems/<%= problem.id %>/edit">
+    <button type="button">
+        Edit Problem
+    </button>
+</a>
+
+<form
+    action="/problems/<%= problem.id %>?_method=DELETE"
+    method="POST"
+    onsubmit="return confirm('Are you sure you want to delete this problem?');"
+>
+
+    <button type="submit">
+        Delete Problem
+    </button>
+
+</form>
+
+<br><br>
+
+<a href="/problems">
+    ← Back to Problems
+</a>
+```
+
+</body>
+
+</html>

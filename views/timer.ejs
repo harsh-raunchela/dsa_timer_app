@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Solving | <%= problem.title %></title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+    <h1><%= problem.title %></h1>
+
+    <p>
+        Difficulty:
+        <%= problem.difficulty %>
+    </p>
+
+    <hr>
+
+    <h2>Time Remaining</h2>
+
+    <div id="timer">
+        00:00
+    </div>
+
+    <br>
+
+    <button id="pauseBtn">
+        Pause
+    </button>
+
+    <button id="finishBtn">
+        Finish
+    </button>
+
+    <script>
+        const problemId = "<%= problem.id %>";
+        const sessionId = "<%= sessionId %>";
+        const sessionDuration = <%= allowedMinutes %>;
+    </script>
+
+    <script src="/timer.js"></script>
+
+</body>
+
+</html>

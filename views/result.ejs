@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Session Result | DSA Focus</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+    <h1>Session Finished</h1>
+
+    <h2><%= problem.title %></h2>
+
+    <p>
+        Difficulty:
+        <%= problem.difficulty %>
+    </p>
+
+    <p>
+        Time Taken:
+        <%= timeTakenMinutes %> minutes
+        <%= timeTakenSeconds %> seconds
+    </p>
+
+    <hr>
+
+    <h2>Did you solve the problem?</h2>
+
+    <form action="/sessions/<%= sessionId %>/result" method="POST">
+
+        <button type="submit" name="result" value="solved">
+            ✓ Solved
+        </button>
+
+        <button type="submit" name="result" value="not_solved">
+            ✗ Couldn't Solve
+        </button>
+
+    </form>
+
+</body>
+
+</html>

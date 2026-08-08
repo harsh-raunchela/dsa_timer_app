@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | DSA Focus</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+    <h1>DSA Focus</h1>
+
+    <p>
+        Your DSA practice dashboard
+    </p>
+
+    <hr>
+
+    <h2>Overview</h2>
+
+    <div>
+
+        <h3>Completed</h3>
+        <p><%= overview.completed %></p>
+
+    </div>
+
+    <div>
+
+        <h3>Revision</h3>
+        <p><%= overview.revision %></p>
+
+    </div>
+
+    <div>
+
+        <h3>Total Attempts</h3>
+        <p><%= overview.totalAttempts %></p>
+
+    </div>
+
+    <div>
+
+        <h3>Successful Attempts</h3>
+        <p><%= overview.solved %></p>
+
+    </div>
+
+    <hr>
+
+    <h2>Performance</h2>
+
+    <p>
+        Success Rate:
+        <strong><%= performance.successRate %>%</strong>
+    </p>
+
+    <p>
+        Average Time:
+        <strong>
+            <%= performance.averageMinutes %> min
+            <%= performance.averageSeconds %> sec
+        </strong>
+    </p>
+
+    <p>
+        Best Time:
+        <strong>
+            <% if (performance.bestTime !== null) { %>
+
+                <%= Math.floor(performance.bestTime / 60) %>
+                min
+                <%= performance.bestTime % 60 %>
+                sec
+
+            <% } else { %>
+
+                No solved problems yet
+
+            <% } %>
+        </strong>
+    </p>
+
+    <hr>
+
+    <h2>Recent Activity</h2>
+
+    <% if (recentSessions.length === 0) { %>
+
+        <p>No activity yet.</p>
+
+    <% } else { %>
+
+        <% recentSessions.forEach(session => { %>
+
+            <div>
+
+                <h3>
+                    <a href="/problems/<%= session.problem_id %>">
+                        <%= session.title %>
+                    </a>
+                </h3>
+
+                <% if (session.result === "solved") { %>
+
+                    <p>✓ Solved</p>
+
+                <% } else if (session.result === "expired") { %>
+
+                    <p>⏱ Time Expired</p>
+
+                <% } else { %>
+
+                    <p>✗ Couldn't Solve</p>
+
+                <% } %>
+
+                <p>
+                    Type:
+                    <%= session.session_type %>
+                </p>
+
+                <p>
+                    Time:
+                    <%= Math.floor(session.time_taken_seconds / 60) %>
+                    min
+                    <%= session.time_taken_seconds %>
+                    sec
+                </p>
+
+                <p>
+                    <%= session.started_at %>
+                </p>
+
+            </div>
+
+            <hr>
+
+        <% }) %>
+
+    <% } %>
+
+    <br>
+
+    <a href="/problems">
+        View All Problems
+    </a>
+
+    <br><br>
+
+    <a href="/problems/completed">
+        Completed Problems
+    </a>
+
+    <br><br>
+
+    <a href="/problems/revision">
+        Revision List
+    </a>
+
+    <br><br>
+
+    <a href="/problems/new">
+        + Add Problem
+    </a>
+
+</body>
+
+</html>

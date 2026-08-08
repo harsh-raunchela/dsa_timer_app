@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Revision | DSA Focus</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+    <h1>Revision Problems</h1>
+
+    <p>
+        Problems to Revise:
+        <strong><%= problems.length %></strong>
+    </p>
+
+    <hr>
+
+    <% if (problems.length === 0) { %>
+
+        <p>Your revision list is empty. Nice!</p>
+
+    <% } else { %>
+
+        <% problems.forEach(problem => { %>
+
+            <div>
+
+                <h2>
+                    <a href="/problems/<%= problem.id %>">
+                        <%= problem.title %>
+                    </a>
+                </h2>
+
+                <p>
+                    Difficulty:
+                    <%= problem.difficulty %>
+                </p>
+
+                <p>
+                    Topic:
+                    <%= problem.topic || "Not specified" %>
+                </p>
+
+                <p>
+                    Platform:
+                    <%= problem.platform || "Not specified" %>
+                </p>
+
+                <p>
+                    Status:
+                    <strong>Needs Revision</strong>
+                </p>
+
+                <a href="/problems/<%= problem.id %>/start?type=revision">
+                    Revise Now
+                </a>
+
+            </div>
+
+            <hr>
+
+        <% }) %>
+
+    <% } %>
+
+    <a href="/problems">
+        ← Back to Problems
+    </a>
+
+</body>
+
+</html>

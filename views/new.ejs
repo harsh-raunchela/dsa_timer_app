@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Problem | DSA Focus</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <h1>Add DSA Problem</h1>
+
+    <form action="/problems" method="POST">
+
+        <div>
+            <label for="title">Problem Title</label>
+
+            <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="e.g. Two Sum"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="difficulty">Difficulty</label>
+
+            <select id="difficulty" name="difficulty" required>
+
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+
+            </select>
+        </div>
+
+        <div>
+            <label for="topic">Topic</label>
+
+            <input
+                type="text"
+                id="topic"
+                name="topic"
+                placeholder="e.g. Arrays"
+            >
+        </div>
+
+        <div>
+            <label for="platform">Platform</label>
+
+            <input
+                type="text"
+                id="platform"
+                name="platform"
+                placeholder="e.g. LeetCode"
+            >
+        </div>
+
+        <div>
+            <label for="problem_url">Problem URL</label>
+
+            <input
+                type="url"
+                id="problem_url"
+                name="problem_url"
+                placeholder="https://leetcode.com/..."
+            >
+        </div>
+
+        <button type="submit">
+            Add Problem
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="/problems">View Problems</a>
+
+</body>
+
+</html>
