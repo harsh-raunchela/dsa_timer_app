@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const db = require("./db");
@@ -31,7 +33,7 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 
 app.use(session({
-    secret: "dsa-focus-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));
