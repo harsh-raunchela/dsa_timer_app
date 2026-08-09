@@ -10,34 +10,38 @@ const bcrypt = require("bcryptjs");
 
 
 const app = express();
-exports.app = app;
-
-const PORT = 3000;
 
 
-// ================================
-// APP CONFIGURATION
-// ================================
+const PORT = process.env.PORT || 3000;
+
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 
-// ================================
-// MIDDLEWARE
-// ================================
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(methodOverride("_method"));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}));
+app.set("trust proxy", 1);
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+
+        resave: false,
+
+        saveUninitialized: false,
+
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
+        }
+    })
+);
 
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -1934,14 +1938,27 @@ app.get("/problems/:id",requireLogin, (req, res) => {
 });
 
 
+
+
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    if (process.env.NODE_ENV === "production") {
+        return res.status(500).send("Something went wrong.");
+    }
+
+    res.status(500).send(err.message);
+});
+
+
+
+
 // ================================
 // START SERVER
 // ================================
 
 app.listen(PORT, () => {
-
-    console.log(
-        `Server running at http://localhost:${PORT}`
-    );
-
+    console.log(`Server running on port ${PORT}`);
 });
