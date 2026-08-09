@@ -1,54 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Solving | <%= problem.title %></title>
-
-    <link rel="stylesheet" href="/style.css">
-
+  <%- include('partials/head') %>
+  <title>Solving | <%= problem.title %></title>
 </head>
-
 <body>
 
-    <h1><%= problem.title %></h1>
+  <a href="/problems/<%= problem.id %>" class="timer-exit">← Exit</a>
 
-    <p>
-        Difficulty:
-        <%= problem.difficulty %>
-    </p>
+  <div class="timer-shell">
 
-    <hr>
+    <div class="clock-scene" id="clockScene">
 
-    <h2>Time Remaining</h2>
+      <div class="clock-context">
+        <span class="eyebrow"><%= problem.title %></span>
+        <h2><%= problem.difficulty %></h2>
+        <div class="clock-tags">
+          <span class="tag tag-<%= problem.difficulty %>"><%= problem.difficulty %></span>
+          <% if (problem.topic) { %><span class="tag tag-plain"><%= problem.topic %></span><% } %>
+        </div>
+      </div>
 
-    <div id="timer">
-        00:00
+      <div class="clock-wrap" id="clockWrap" style="--clock-color: var(--accent);">
+        <svg viewBox="0 0 200 200">
+          <circle class="clock-face-ring" cx="100" cy="100" r="88" />
+          <circle class="clock-progress" id="clockProgress" cx="100" cy="100" r="88"
+                  stroke-dasharray="552.9" stroke-dashoffset="0" />
+          <% for (let i = 0; i < 12; i++) { %>
+            <line class="clock-tick <%= i % 3 === 0 ? 'major' : '' %>"
+                  x1="100" y1="16" x2="100" y2="<%= i % 3 === 0 ? 24 : 21 %>"
+                  transform="rotate(<%= i * 30 %> 100 100)" />
+          <% } %>
+          <line class="clock-hand" id="clockHand" x1="100" y1="100" x2="100" y2="34" transform="rotate(0 100 100)" />
+          <circle class="clock-hub" cx="100" cy="100" r="4.5" />
+        </svg>
+        <div class="clock-digital">
+          <span class="clock-time" id="timer">00:00</span>
+        </div>
+      </div>
+
+      <span class="clock-status">Time Remaining</span>
     </div>
 
-    <br>
+    <div class="btn-row">
+      <button id="pauseBtn" class="btn btn-secondary btn-lg">Pause</button>
+      <button id="finishBtn" class="btn btn-primary btn-lg">Finish</button>
+    </div>
 
-    <button id="pauseBtn">
-        Pause
-    </button>
+  </div>
 
-    <button id="finishBtn">
-        Finish
-    </button>
-
-    <script>
-        const problemId = "<%= problem.id %>";
-        const sessionId = "<%= sessionId %>";
-        const sessionDuration = <%= allowedMinutes %>;
-    </script>
-
-    <script src="/timer.js"></script>
+  <script>
+    const problemId = "<%= problem.id %>";
+    const sessionId = "<%= sessionId %>";
+    const sessionDuration = <%= allowedMinutes %>;
+  </script>
+  <script src="/timer.js"></script>
 
 </body>
-
 </html>

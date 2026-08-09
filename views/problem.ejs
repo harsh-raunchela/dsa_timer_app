@@ -1,253 +1,126 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
-```
-<meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
-<title><%= problem.title %> | DSA Focus</title>
-
-<link rel="stylesheet" href="/style.css">
-```
-
+  <%- include('partials/head') %>
+  <title><%= problem.title %> | DSA Focus</title>
 </head>
-
 <body>
 
-```
-<h1><%= problem.title %></h1>
+  <%- include('partials/navbar', { active: 'problems' }) %>
 
-<p>
-    <strong>Difficulty:</strong>
-    <%= problem.difficulty %>
-</p>
+  <div class="page">
 
-<p>
-    <strong>Topic:</strong>
-    <%= problem.topic || "Not specified" %>
-</p>
+    <div class="detail-head">
+      <div class="detail-title-row">
+        <h1><%= problem.title %></h1>
+        <% if (problem.problem_url) { %>
+          <a href="<%= problem.problem_url %>" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Open Problem ↗</a>
+        <% } %>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-<%= problem.difficulty %>"><%= problem.difficulty %></span>
+        <span class="tag tag-plain"><%= problem.topic || "General" %></span>
+        <span class="tag tag-plain"><%= problem.platform || "—" %></span>
+      </div>
+    </div>
 
-<p>
-    <strong>Platform:</strong>
-    <%= problem.platform || "Not specified" %>
-</p>
+    <div class="detail-grid">
 
-<% if (problem.problem_url) { %>
-
-    <p>
-        <a
-            href="<%= problem.problem_url %>"
-            target="_blank"
-            rel="noopener noreferrer"
-        >
-            Open Problem
-        </a>
-    </p>
-
-<% } %>
-
-<hr>
-
-<h2>Your Statistics</h2>
-
-<p>
-    Total Attempts:
-    <strong>
-        <%= stats.totalAttempts || 0 %>
-    </strong>
-</p>
-
-<p>
-    Solved:
-    <strong>
-        <%= stats.solvedAttempts || 0 %>
-    </strong>
-</p>
-
-<p>
-    Failed:
-    <strong>
-        <%= stats.failedAttempts || 0 %>
-    </strong>
-</p>
-
-<p>
-    Revision Attempts:
-    <strong>
-        <%= stats.revisionAttempts || 0 %>
-    </strong>
-</p>
-
-<p>
-    Best Time:
-
-    <% if (stats.bestTime !== null) { %>
-
-        <strong>
-            <%= Math.floor(stats.bestTime / 60) %>
-            min
-            <%= stats.bestTime % 60 %>
-            sec
-        </strong>
-
-    <% } else { %>
-
-        <strong>
-            Not solved yet
-        </strong>
-
-    <% } %>
-
-</p>
-
-<hr>
-
-<h2>Attempt History</h2>
-
-<% if (history.length === 0) { %>
-
-    <p>
-        No completed attempts yet.
-    </p>
-
-<% } else { %>
-
-    <% history.forEach((session) => { %>
-
-        <div>
-
-            <h3>
-
-                <% if (session.session_type === "revision") { %>
-
-                    Revision
-
-                <% } else { %>
-
-                    Initial Attempt
-
-                <% } %>
-
-            </h3>
-
-            <% if (session.result === "solved") { %>
-
-                <p>
-                    ✓ Solved
-                </p>
-
-            <% } else if (session.result === "expired") { %>
-
-                <p>
-                    ⏱ Time Expired
-                </p>
-
-            <% } else { %>
-
-                <p>
-                    ✗ Couldn't Solve
-                </p>
-
-            <% } %>
-
-            <p>
-                Allowed Time:
-                <%= session.allowed_minutes %> minutes
-            </p>
-
-            <% if (session.time_taken_seconds !== null) { %>
-
-                <p>
-                    Time Taken:
-
-                    <%= Math.floor(
-                        session.time_taken_seconds / 60
-                    ) %>
-
-                    min
-
-                    <%= session.time_taken_seconds % 60 %>
-
-                    sec
-                </p>
-
-            <% } %>
-
-            <p>
-                Started:
-                <%= session.started_at %>
-            </p>
-
+      <div>
+        <h2>Your Statistics</h2>
+        <div class="stat-mini-grid">
+          <div class="card stat-mini">
+            <div class="stat-label">Attempts</div>
+            <div class="stat-value"><%= stats.totalAttempts || 0 %></div>
+          </div>
+          <div class="card stat-mini">
+            <div class="stat-label">Solved</div>
+            <div class="stat-value success"><%= stats.solvedAttempts || 0 %></div>
+          </div>
+          <div class="card stat-mini">
+            <div class="stat-label">Failed</div>
+            <div class="stat-value" style="color:var(--danger);"><%= stats.failedAttempts || 0 %></div>
+          </div>
+          <div class="card stat-mini">
+            <div class="stat-label">Best Time</div>
+            <div class="stat-value accent">
+              <% if (stats.bestTime !== null) { %>
+                <%= Math.floor(stats.bestTime / 60) %>m <%= stats.bestTime % 60 %>s
+              <% } else { %>
+                —
+              <% } %>
+            </div>
+          </div>
         </div>
 
-        <hr>
+        <h2>Attempt History</h2>
+        <div class="card">
+          <% if (history.length === 0) { %>
+            <p style="padding:6px 0;">No completed attempts yet.</p>
+          <% } else { %>
+            <% history.forEach(session => { %>
+              <div class="history-item">
+                <div class="history-left">
+                  <% if (session.result === "solved") { %>
+                    <span class="status-pill status-completed"><span class="status-dot"></span>Solved</span>
+                  <% } else if (session.result === "expired") { %>
+                    <span class="status-pill status-expired"><span class="status-dot"></span>Expired</span>
+                  <% } else { %>
+                    <span class="status-pill status-revision"><span class="status-dot"></span>Couldn't Solve</span>
+                  <% } %>
+                  <span class="tag tag-plain"><%= session.session_type %></span>
+                </div>
+                <div class="history-meta">
+                  <% if (session.time_taken_seconds !== null) { %>
+                    <%= Math.floor(session.time_taken_seconds / 60) %>m <%= session.time_taken_seconds % 60 %>s
+                    ·
+                  <% } %>
+                  <%= session.allowed_minutes %>m allowed
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
 
-    <% }) %>
+      <div>
+        <div class="card clock-scene">
+          <span class="eyebrow">Interview Time Limit</span>
+          <div class="clock-wrap clock-sm" style="--clock-color: var(--accent); margin: 4px 0;">
+            <svg viewBox="0 0 200 200">
+              <circle class="clock-face-ring" cx="100" cy="100" r="88" />
+              <% for (let i = 0; i < 12; i++) { %>
+                <line class="clock-tick <%= i % 3 === 0 ? 'major' : '' %>"
+                      x1="100" y1="16" x2="100" y2="<%= i % 3 === 0 ? 24 : 21 %>"
+                      transform="rotate(<%= i * 30 %> 100 100)" />
+              <% } %>
+            </svg>
+            <div class="clock-digital">
+              <span class="clock-time">
+                <% if (problem.difficulty === "easy") { %>25:00
+                <% } else if (problem.difficulty === "medium") { %>45:00
+                <% } else { %>60:00<% } %>
+              </span>
+            </div>
+          </div>
+          <span class="clock-status">
+            <%= problem.difficulty %> problem
+          </span>
+          <a href="/problems/<%= problem.id %>/start" class="btn btn-primary btn-block btn-lg" style="margin-top:6px;">Start Solving</a>
+        </div>
 
-<% } %>
+        <div class="secondary-actions">
+          <a href="/problems/<%= problem.id %>/edit" class="btn btn-ghost btn-sm">Edit Problem</a>
+          <form action="/problems/<%= problem.id %>?_method=DELETE" method="POST"
+                onsubmit="return confirm('Are you sure you want to delete this problem?');">
+            <button type="submit" class="btn btn-danger-ghost btn-sm">Delete Problem</button>
+          </form>
+        </div>
+      </div>
 
-<h2>Recommended Time</h2>
+    </div>
 
-<% if (problem.difficulty === "easy") { %>
-
-    <p>
-        25 minutes
-    </p>
-
-<% } else if (problem.difficulty === "medium") { %>
-
-    <p>
-        45 minutes
-    </p>
-
-<% } else { %>
-
-    <p>
-        60 minutes
-    </p>
-
-<% } %>
-
-<br>
-
-<a href="/problems/<%= problem.id %>/start">
-    <button type="button">
-        Start Solving
-    </button>
-</a>
-
-<br><br>
-
-<a href="/problems/<%= problem.id %>/edit">
-    <button type="button">
-        Edit Problem
-    </button>
-</a>
-
-<form
-    action="/problems/<%= problem.id %>?_method=DELETE"
-    method="POST"
-    onsubmit="return confirm('Are you sure you want to delete this problem?');"
->
-
-    <button type="submit">
-        Delete Problem
-    </button>
-
-</form>
-
-<br><br>
-
-<a href="/problems">
-    ← Back to Problems
-</a>
-```
+  </div>
 
 </body>
-
 </html>

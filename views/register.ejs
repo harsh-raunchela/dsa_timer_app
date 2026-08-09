@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <title>Register | DSA Focus</title>
+</head>
+<body>
+
+  <div class="page page--narrow">
+    <div class="auth-wrap">
+
+      <div class="auth-brand">
+        <span class="brand-mark" style="font-size:24px;">⚡</span>
+        <h1 style="font-size:22px;">Create your account</h1>
+        <p style="margin:0;">Start practicing with real interview pressure.</p>
+      </div>
+
+      <div class="card auth-card">
+        <form action="/register" method="POST">
+
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="field" style="margin-bottom:24px;">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Register</button>
+
+        </form>
+      </div>
+
+      <p class="form-foot" style="margin-top:-6px;">
+        Already have an account? <a href="/login">Login</a>
+      </p>
+
+    </div>
+  </div>
+
+</body>
+</html>

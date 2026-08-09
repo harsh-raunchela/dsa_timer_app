@@ -1,31 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
+  <%- include('partials/head') %>
+  <title>DSA Focus — Practice under pressure</title>
 </head>
-
 <body>
 
-    <h1>DSA Focus</h1>
+  <nav class="navbar landing-nav">
+    <div class="navbar-inner">
+      <a href="/" class="brand"><span class="brand-mark">⚡</span> DSA Focus</a>
+      <div class="nav-right">
+        <a href="/login" class="btn btn-ghost btn-sm">Login</a>
+        <a href="/register" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </nav>
 
-    <p>
-        Practice DSA with interview-style time pressure.
-    </p>
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Interview-style DSA practice</span>
+      <h1 style="margin-top:14px;">Solve DSA like<br>you're <span class="accent-word">in the interview.</span></h1>
+      <p>Set the problem. Start the clock. Solve under pressure. Track your progress.</p>
+      <div class="btn-row">
+        <a href="/register" class="btn btn-primary btn-lg">Start Practicing</a>
+        <a href="/login" class="btn btn-secondary btn-lg">View Problems</a>
+      </div>
 
-    <a href="/dashboard">
-        Open Dashboard
-    </a>
+      <div class="mini-steps">
+        <div class="mini-step">
+          <span class="mini-step-index">1</span>
+          <span class="mini-step-text"><strong>Choose a problem</strong> — pick from your list or add a new one.</span>
+        </div>
+        <div class="mini-step">
+          <span class="mini-step-index">2</span>
+          <span class="mini-step-text"><strong>Beat the clock</strong> — an interview-length timer starts the second you do.</span>
+        </div>
+        <div class="mini-step">
+          <span class="mini-step-index">3</span>
+          <span class="mini-step-text"><strong>Revise what you missed</strong> — unsolved problems return to your queue.</span>
+        </div>
+      </div>
+    </div>
 
-    <a href="/problems">
-        View Problems
-    </a>
+    <div class="hero-visual">
+      <div class="clock-scene">
+        <div class="clock-context">
+          <span class="eyebrow">Two Sum</span>
+          <h2>Medium</h2>
+          <div class="clock-tags">
+            <span class="tag tag-plain">Arrays</span>
+          </div>
+        </div>
+
+        <div class="clock-wrap" style="--clock-color: var(--accent);">
+          <svg viewBox="0 0 200 200">
+            <circle class="clock-face-ring" cx="100" cy="100" r="88" />
+            <circle class="clock-progress" cx="100" cy="100" r="88"
+                    stroke-dasharray="552.9" stroke-dashoffset="199" />
+            <% for (let i = 0; i < 12; i++) { %>
+              <line class="clock-tick <%= i % 3 === 0 ? 'major' : '' %>"
+                    x1="100" y1="16" x2="100" y2="<%= i % 3 === 0 ? 24 : 21 %>"
+                    transform="rotate(<%= i * 30 %> 100 100)" />
+            <% } %>
+            <line class="clock-hand" x1="100" y1="100" x2="100" y2="34" transform="rotate(212 100 100)" />
+            <circle class="clock-hub" cx="100" cy="100" r="4.5" />
+          </svg>
+          <div class="clock-digital">
+            <span class="clock-time">42:17</span>
+          </div>
+        </div>
+
+        <span class="clock-status">Time Remaining</span>
+      </div>
+    </div>
+  </section>
 
 </body>
-
 </html>

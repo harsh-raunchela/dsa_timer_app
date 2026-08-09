@@ -1,177 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard | DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
-
+  <%- include('partials/head') %>
+  <title>Dashboard | DSA Focus</title>
 </head>
-
 <body>
 
-    <h1>DSA Focus</h1>
+  <%- include('partials/navbar', { active: 'dashboard' }) %>
 
-    <p>
-        Your DSA practice dashboard
-    </p>
+  <div class="page">
 
-    <hr>
+    <h1>Good to see you.</h1>
+    <p class="subtitle">Ready for your next problem?</p>
 
-    <h2>Overview</h2>
-
-    <div>
-
-        <h3>Completed</h3>
-        <p><%= overview.completed %></p>
-
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value success"><%= overview.completed %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Revision</div>
+        <div class="stat-value revision"><%= overview.revision %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Attempts</div>
+        <div class="stat-value"><%= overview.totalAttempts %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Solved Attempts</div>
+        <div class="stat-value accent"><%= overview.solved %></div>
+      </div>
     </div>
 
-    <div>
-
-        <h3>Revision</h3>
-        <p><%= overview.revision %></p>
-
+    <div class="card" style="margin-bottom:32px;">
+      <div class="section-head" style="margin-bottom:0;">
+        <h2 style="margin-bottom:0;">Success Rate</h2>
+        <span class="stat-value accent" style="font-size:18px;"><%= performance.successRate %>%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: <%= performance.successRate %>%;"></div>
+      </div>
+      <div class="progress-caption">
+        <span>Average time: <%= performance.averageMinutes %>m <%= performance.averageSeconds %>s</span>
+        <span>
+          Best time:
+          <% if (performance.bestTime !== null) { %>
+            <%= Math.floor(performance.bestTime / 60) %>m <%= performance.bestTime % 60 %>s
+          <% } else { %>
+            —
+          <% } %>
+        </span>
+      </div>
     </div>
 
-    <div>
-
-        <h3>Total Attempts</h3>
-        <p><%= overview.totalAttempts %></p>
-
+    <div class="section-head">
+      <h2 style="margin-bottom:0;">Recent Activity</h2>
     </div>
-
-    <div>
-
-        <h3>Successful Attempts</h3>
-        <p><%= overview.solved %></p>
-
-    </div>
-
-    <hr>
-
-    <h2>Performance</h2>
-
-    <p>
-        Success Rate:
-        <strong><%= performance.successRate %>%</strong>
-    </p>
-
-    <p>
-        Average Time:
-        <strong>
-            <%= performance.averageMinutes %> min
-            <%= performance.averageSeconds %> sec
-        </strong>
-    </p>
-
-    <p>
-        Best Time:
-        <strong>
-            <% if (performance.bestTime !== null) { %>
-
-                <%= Math.floor(performance.bestTime / 60) %>
-                min
-                <%= performance.bestTime % 60 %>
-                sec
-
-            <% } else { %>
-
-                No solved problems yet
-
-            <% } %>
-        </strong>
-    </p>
-
-    <hr>
-
-    <h2>Recent Activity</h2>
 
     <% if (recentSessions.length === 0) { %>
-
-        <p>No activity yet.</p>
-
+      <div class="card empty-state">
+        <p>No activity yet. Start your first timed session to see it here.</p>
+        <a href="/problems" class="btn btn-primary">Browse Problems</a>
+      </div>
     <% } else { %>
-
+      <div class="problem-list" style="margin-bottom:36px;">
         <% recentSessions.forEach(session => { %>
-
-            <div>
-
-                <h3>
-                    <a href="/problems/<%= session.problem_id %>">
-                        <%= session.title %>
-                    </a>
-                </h3>
-
+          <a href="/problems/<%= session.problem_id %>" class="card card-link problem-card">
+            <div class="problem-main">
+              <div class="problem-title-row">
+                <h3><%= session.title %></h3>
                 <% if (session.result === "solved") { %>
-
-                    <p>✓ Solved</p>
-
+                  <span class="status-pill status-completed"><span class="status-dot"></span>Solved</span>
                 <% } else if (session.result === "expired") { %>
-
-                    <p>⏱ Time Expired</p>
-
+                  <span class="status-pill status-expired"><span class="status-dot"></span>Expired</span>
                 <% } else { %>
-
-                    <p>✗ Couldn't Solve</p>
-
+                  <span class="status-pill status-revision"><span class="status-dot"></span>Couldn't Solve</span>
                 <% } %>
-
-                <p>
-                    Type:
-                    <%= session.session_type %>
-                </p>
-
-                <p>
-                    Time:
-                    <%= Math.floor(session.time_taken_seconds / 60) %>
-                    min
-                    <%= session.time_taken_seconds %>
-                    sec
-                </p>
-
-                <p>
-                    <%= session.started_at %>
-                </p>
-
+              </div>
+              <div class="problem-meta">
+                <%= session.session_type %> · <%= Math.floor(session.time_taken_seconds / 60) %>m <%= session.time_taken_seconds % 60 %>s · <%= session.started_at %>
+              </div>
             </div>
-
-            <hr>
-
+          </a>
         <% }) %>
-
+      </div>
     <% } %>
 
-    <br>
+    <div class="btn-row">
+      <a href="/problems" class="btn btn-secondary">All Problems</a>
+      <a href="/problems/completed" class="btn btn-secondary">Completed</a>
+      <a href="/problems/revision" class="btn btn-secondary">Revision Queue</a>
+      <a href="/problems/new" class="btn btn-primary">+ Add Problem</a>
+    </div>
 
-    <a href="/problems">
-        View All Problems
-    </a>
-
-    <br><br>
-
-    <a href="/problems/completed">
-        Completed Problems
-    </a>
-
-    <br><br>
-
-    <a href="/problems/revision">
-        Revision List
-    </a>
-
-    <br><br>
-
-    <a href="/problems/new">
-        + Add Problem
-    </a>
+  </div>
 
 </body>
-
 </html>

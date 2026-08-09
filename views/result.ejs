@@ -1,52 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Session Result | DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
-
+  <%- include('partials/head') %>
+  <title>Session Result | DSA Focus</title>
 </head>
-
 <body>
 
-    <h1>Session Finished</h1>
+  <%- include('partials/navbar') %>
 
-    <h2><%= problem.title %></h2>
+  <div class="result-shell">
+    <div class="card result-card">
 
-    <p>
-        Difficulty:
+      <span class="eyebrow">Session Complete</span>
+      <h1 style="margin-top:10px;"><%= problem.title %></h1>
+
+      <span class="result-badge tag-<%= problem.difficulty %>" style="background: var(--border-soft); color: var(--text-dim); border: 1px solid var(--border);">
         <%= problem.difficulty %>
-    </p>
+      </span>
 
-    <p>
-        Time Taken:
-        <%= timeTakenMinutes %> minutes
-        <%= timeTakenSeconds %> seconds
-    </p>
+      <div class="result-stats">
+        <div>
+          <div class="result-stat-label">Time Taken</div>
+          <div class="result-stat-value accent-word" style="color:var(--accent-strong);"><%= timeTakenMinutes %>m <%= timeTakenSeconds %>s</div>
+        </div>
+      </div>
 
-    <hr>
+      <h2 style="margin-bottom:16px;">Did you solve it?</h2>
 
-    <h2>Did you solve the problem?</h2>
+      <form action="/sessions/<%= sessionId %>/result" method="POST" class="btn-row" style="justify-content:center;">
+        <button type="submit" name="result" value="solved" class="btn btn-primary btn-lg">✓ Solved</button>
+        <button type="submit" name="result" value="not_solved" class="btn btn-secondary btn-lg">✗ Couldn't Solve</button>
+      </form>
 
-    <form action="/sessions/<%= sessionId %>/result" method="POST">
-
-        <button type="submit" name="result" value="solved">
-            ✓ Solved
-        </button>
-
-        <button type="submit" name="result" value="not_solved">
-            ✗ Couldn't Solve
-        </button>
-
-    </form>
+    </div>
+  </div>
 
 </body>
-
 </html>

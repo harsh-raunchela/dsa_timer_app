@@ -1,0 +1,25 @@
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="/dashboard" class="brand">
+      <span class="brand-mark">⚡</span> DSA Focus
+    </a>
+
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-link <%= typeof active !== 'undefined' && active === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/problems" class="nav-link <%= typeof active !== 'undefined' && active === 'problems' ? 'active' : '' %>">Problems</a>
+      <a href="/problems/completed" class="nav-link <%= typeof active !== 'undefined' && active === 'completed' ? 'active' : '' %>">Completed</a>
+      <a href="/problems/revision" class="nav-link <%= typeof active !== 'undefined' && active === 'revision' ? 'active' : '' %>">Revision</a>
+    </div>
+
+    <div class="nav-right">
+      <% if (typeof userName !== 'undefined' && userName) { %>
+        <span class="nav-user"><%= userName %></span>
+      <% } %>
+      <form action="/logout" method="POST" class="logout-form">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+
+    <button class="nav-toggle" aria-label="Menu">☰</button>
+  </div>
+</nav>

@@ -1,66 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-
-    <title>Problems | DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
+  <%- include('partials/head') %>
+  <title>Problems | DSA Focus</title>
 </head>
-
 <body>
 
-    <h1>DSA Problems</h1>
+  <%- include('partials/navbar', { active: 'problems' }) %>
 
-    <a href="/problems/new">+ Add Problem</a>
+  <div class="page">
 
-    <hr>
+    <div class="section-head">
+      <div>
+        <h1>DSA Problems</h1>
+        <p class="subtitle" style="margin-bottom:0;">Practice and manage your problem collection.</p>
+      </div>
+      <a href="/problems/new" class="btn btn-primary">+ Add Problem</a>
+    </div>
+
+    <div class="filter-bar" style="margin-top:24px;">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search problems...">
+      <div class="chip-group" id="difficultyFilter">
+        <span class="chip active" data-difficulty="all">All</span>
+        <span class="chip" data-difficulty="easy">Easy</span>
+        <span class="chip" data-difficulty="medium">Medium</span>
+        <span class="chip" data-difficulty="hard">Hard</span>
+      </div>
+    </div>
 
     <% if (problems.length === 0) { %>
-
-        <p>No problems added yet.</p>
-
+      <div class="card empty-state">
+        <p>No problems added yet. Add your first one to start a timed session.</p>
+        <a href="/problems/new" class="btn btn-primary">+ Add Problem</a>
+      </div>
     <% } else { %>
+      <div class="problem-list" id="problemList">
 
         <% problems.forEach(problem => { %>
+          <div class="card problem-card"
+               data-title="<%= problem.title.toLowerCase() %>"
+               data-difficulty="<%= problem.difficulty %>">
 
-            <div>
+            <div class="problem-main">
+              <div class="problem-title-row">
+                <a href="/problems/<%= problem.id %>"><h3><%= problem.title %></h3></a>
+                <% if (problem.status === "completed") { %>
+                  <span class="status-pill status-completed"><span class="status-dot"></span>Completed</span>
+                <% } else if (problem.status === "revision") { %>
+                  <span class="status-pill status-revision"><span class="status-dot"></span>Revision</span>
+                <% } else { %>
+                  <span class="status-pill status-not_started"><span class="status-dot"></span>Not started</span>
+                <% } %>
+              </div>
 
-               <h2>
-                    <a href="/problems/<%= problem.id %>">
-                    <%= problem.title %>
-                    </a>
-                </h2>
-
-                <p>
-                    Difficulty:
-                    <%= problem.difficulty %>
-                </p>
-
-                <p>
-                    Topic:
-                    <%= problem.topic || "Not specified" %>
-                </p>
-
-                <p>
-                    Platform:
-                    <%= problem.platform || "Not specified" %>
-                </p>
-
-                <p>
-                    Status:
-                    <%= problem.status %>
-                </p>
-
+              <div class="tag-row">
+                <span class="tag tag-<%= problem.difficulty %>"><%= problem.difficulty %></span>
+                <span class="tag tag-plain"><%= problem.topic || "General" %></span>
+                <span class="tag tag-plain"><%= problem.platform || "—" %></span>
+              </div>
             </div>
 
-            <hr>
+            <div class="problem-actions">
+              <% if (problem.status === "revision") { %>
+                <a href="/problems/<%= problem.id %>/start?type=revision" class="btn btn-secondary btn-sm">Start Revision</a>
+              <% } else { %>
+                <a href="/problems/<%= problem.id %>/start" class="btn btn-secondary btn-sm">Start Solving</a>
+              <% } %>
+              <a href="/problems/<%= problem.id %>" class="icon-btn" title="View details">→</a>
+            </div>
 
+          </div>
         <% }) %>
 
+      </div>
     <% } %>
 
-</body>
+  </div>
 
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const chips = document.querySelectorAll("#difficultyFilter .chip");
+    const cards = document.querySelectorAll("#problemList .problem-card");
+    let activeDifficulty = "all";
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      cards.forEach(card => {
+        const matchesSearch = card.dataset.title.includes(query);
+        const matchesDifficulty = activeDifficulty === "all" || card.dataset.difficulty === activeDifficulty;
+        card.style.display = (matchesSearch && matchesDifficulty) ? "" : "none";
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener("input", applyFilters);
+
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => {
+          chips.forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          activeDifficulty = chip.dataset.difficulty;
+          applyFilters();
+        });
+      });
+    }
+  </script>
+
+</body>
 </html>

@@ -2,8 +2,13 @@ const express = require("express");
 const path = require("path");
 const db = require("./db");
 const methodOverride = require("method-override");
+const session = require("express-session");
+const bcrypt = require("bcryptjs");
+
+
 
 const app = express();
+exports.app = app;
 
 const PORT = 3000;
 
@@ -25,7 +30,254 @@ app.use(express.json());
 
 app.use(methodOverride("_method"));
 
+app.use(session({
+    secret: "dsa-focus-secret",
+    resave: false,
+    saveUninitialized: false
+}));
+
+
+
 app.use(express.static(path.join(__dirname, "public")));
+
+
+app.use((req, res, next) => {
+    res.locals.userName = req.session.userName || null;
+    next();
+});
+
+
+function requireLogin(req, res, next) {
+
+    if (!req.session.userId) {
+        return res.redirect("/login");
+    }
+
+    next();
+
+}
+exports.requireLogin = requireLogin;
+
+
+
+//register route
+app.get("/register", (req, res) => {
+
+    res.render("register");
+
+});
+
+
+//register post route
+
+app.post("/register", async (req, res) => {
+
+    const {
+        name,
+        email,
+        password
+    } = req.body;
+
+
+    const hashedPassword =
+        await bcrypt.hash(password, 10);
+
+
+    const sql = `
+        INSERT INTO users
+        (name, email, password)
+        VALUES (?, ?, ?)
+    `;
+
+
+    db.query(
+        sql,
+        [
+            name,
+            email,
+            hashedPassword
+        ],
+        (err, result) => {
+
+            if (err) {
+
+                console.error(
+                    "Error creating user:",
+                    err
+                );
+
+                if (err.code === "ER_DUP_ENTRY") {
+
+                    return res
+                        .status(400)
+                        .send(
+                            "Email is already registered"
+                        );
+                }
+
+                return res
+                    .status(500)
+                    .send("Database error");
+            }
+
+
+            console.log(
+                "User created:",
+                result.insertId
+            );
+
+
+            res.redirect("/login");
+
+        }
+    );
+
+});
+
+
+//login route
+app.get("/login", (req, res) => {
+
+    res.render("login");
+
+});
+
+
+//login post route 
+app.post("/login", (req, res) => {
+
+    const {
+        email,
+        password
+    } = req.body;
+
+
+    const sql = `
+        SELECT *
+        FROM users
+        WHERE email = ?
+    `;
+
+
+    db.query(
+        sql,
+        [email],
+        async (err, results) => {
+
+            if (err) {
+
+                console.error(
+                    "Error finding user:",
+                    err
+                );
+
+                return res
+                    .status(500)
+                    .send("Database error");
+            }
+
+
+            if (results.length === 0) {
+
+                return res
+                    .status(401)
+                    .send(
+                        "Invalid email or password"
+                    );
+            }
+
+
+            const user = results[0];
+
+
+            const passwordMatch =
+                await bcrypt.compare(
+                    password,
+                    user.password
+                );
+
+
+            if (!passwordMatch) {
+
+                return res
+                    .status(401)
+                    .send(
+                        "Invalid email or password"
+                    );
+            }
+
+
+            // Login successful
+
+            req.session.userId = user.id;
+
+            req.session.userName = user.name;
+
+
+            console.log(
+                "User logged in:",
+                user.id
+            );
+
+
+            res.redirect("/dashboard");
+
+        }
+    );
+
+});
+
+app.get("/problems", requireLogin, (req, res) => {
+
+    const sql = `
+        SELECT *
+        FROM problems
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+    `;
+
+    db.query(
+        sql,
+        [req.session.userId],
+        (err, problems) => {
+
+            if (err) {
+                console.error(
+                    "Error fetching problems:",
+                    err
+                );
+
+                return res
+                    .status(500)
+                    .send("Database error");
+            }
+
+            res.render("problems", {
+                problems
+            });
+
+        }
+    );
+
+});
+
+
+
+//logout route
+app.post("/logout", (req, res) => {
+
+    req.session.destroy((err) => {
+
+        if (err) {
+            console.error("Error logging out:", err);
+            return res.status(500).send("Could not log out");
+        }
+
+        res.redirect("/login");
+
+    });
+
+});
 
 
 // ================================
@@ -48,7 +300,7 @@ app.get("/", (req, res) => {
 // Add New Problem - Form
 // -------------------------------
 
-app.get("/problems/new", (req, res) => {
+app.get("/problems/new",requireLogin, (req, res) => {
 
     res.render("new");
 
@@ -59,7 +311,7 @@ app.get("/problems/new", (req, res) => {
 // Create New Problem
 // -------------------------------
 
-app.post("/problems", (req, res) => {
+app.post("/problems",requireLogin, (req, res) => {
 
     let {
         title,
@@ -136,9 +388,10 @@ app.post("/problems", (req, res) => {
             difficulty,
             topic,
             platform,
-            problem_url
+            problem_url,
+            user_id
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
 
 
@@ -149,7 +402,8 @@ app.post("/problems", (req, res) => {
             difficulty,
             topic || null,
             platform || null,
-            problem_url || null
+            problem_url || null,
+            req.session.userId
         ],
         (err, result) => {
 
@@ -181,55 +435,21 @@ app.post("/problems", (req, res) => {
 
 
 // -------------------------------
-// All Problems
-// -------------------------------
-
-app.get("/problems", (req, res) => {
-
-    const sql = `
-        SELECT *
-        FROM problems
-        ORDER BY created_at DESC
-    `;
-
-    db.query(sql, (err, problems) => {
-
-        if (err) {
-
-            console.error(
-                "Error fetching problems:",
-                err
-            );
-
-            return res
-                .status(500)
-                .send("Database error");
-        }
-
-        res.render("problems", {
-            problems
-        });
-
-    });
-
-});
-
-
-// -------------------------------
 // Completed Problems
 // IMPORTANT: Before /problems/:id
 // -------------------------------
 
-app.get("/problems/completed", (req, res) => {
+app.get("/problems/completed",requireLogin, (req, res) => {
 
     const sql = `
-        SELECT *
-        FROM problems
-        WHERE status = 'completed'
-        ORDER BY created_at DESC
-    `;
+    SELECT *
+    FROM problems
+    WHERE user_id = ?
+    AND status = 'completed'
+    ORDER BY created_at DESC
+`;
 
-    db.query(sql, (err, problems) => {
+    db.query(sql, [req.session.userId], (err, problems) => {
 
         if (err) {
 
@@ -257,16 +477,17 @@ app.get("/problems/completed", (req, res) => {
 // IMPORTANT: Before /problems/:id
 // -------------------------------
 
-app.get("/problems/revision", (req, res) => {
+app.get("/problems/revision", requireLogin, (req, res) => {
 
     const sql = `
         SELECT *
         FROM problems
-        WHERE status = 'revision'
+        WHERE user_id = ?
+        AND status = 'revision'
         ORDER BY created_at DESC
     `;
 
-    db.query(sql, (err, problems) => {
+    db.query(sql, [req.session.userId],(err, problems) => {
 
         if (err) {
 
@@ -293,7 +514,7 @@ app.get("/problems/revision", (req, res) => {
 // DASHBOARD
 // ================================
 
-app.get("/dashboard", (req, res) => {
+app.get("/dashboard",requireLogin, (req, res) => {
 
     // -------------------------------
     // Overview
@@ -319,10 +540,12 @@ app.get("/dashboard", (req, res) => {
             ) AS revision
 
         FROM problems
+        WHERE user_id = ?
     `;
 
     db.query(
         overviewSQL,
+        [req.session.userId],
         (err, overviewResults) => {
 
             if (err) {
@@ -373,12 +596,15 @@ app.get("/dashboard", (req, res) => {
                     ) AS bestTime
 
                 FROM sessions
-
-                WHERE result IS NOT NULL
+                JOIN problems
+                     ON sessions.problem_id = problems.id
+                WHERE sessions.result IS NOT NULL
+                AND problems.user_id = ?
             `;
 
             db.query(
                 attemptsSQL,
+                [req.session.userId],
                 (err, attemptResults) => {
 
                     if (err) {
@@ -443,20 +669,18 @@ app.get("/dashboard", (req, res) => {
                             sessions.started_at,
                             problems.title
 
-                        FROM sessions
+                        
 
+                        FROM sessions
                         JOIN problems
                             ON sessions.problem_id = problems.id
-
                         WHERE sessions.result IS NOT NULL
-
-                        ORDER BY sessions.started_at DESC
-
-                        LIMIT 5
+                        AND problems.user_id = ?
                     `;
 
                     db.query(
                         recentSQL,
+                        [req.session.userId],
                         (err, recentSessions) => {
 
                             if (err) {
@@ -542,7 +766,7 @@ app.get("/dashboard", (req, res) => {
 // Start Solving
 // -------------------------------
 
-app.get("/problems/:id/start", (req, res) => {
+app.get("/problems/:id/start",requireLogin, (req, res) => {
 
     const { id } = req.params;
 
@@ -564,11 +788,12 @@ app.get("/problems/:id/start", (req, res) => {
         SELECT *
         FROM problems
         WHERE id = ?
+        AND user_id = ?
     `;
 
     db.query(
         getProblemSQL,
-        [id],
+        [id,req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -688,24 +913,27 @@ app.get("/problems/:id/start", (req, res) => {
 // Finish Session
 // -------------------------------
 
-app.post("/sessions/:id/finish", (req, res) => {
+app.post("/sessions/:id/finish",requireLogin, (req, res) => {
 
     const sessionId = req.params.id;
 
     const getSessionSQL = `
-        SELECT
-            id,
-            problem_id,
-            started_at,
-            finished_at,
-            result
-        FROM sessions
-        WHERE id = ?
-    `;
+    SELECT
+        sessions.id,
+        sessions.problem_id,
+        sessions.started_at,
+        sessions.finished_at,
+        sessions.result
+    FROM sessions
+    JOIN problems
+        ON sessions.problem_id = problems.id
+    WHERE sessions.id = ?
+    AND problems.user_id = ?
+`;
 
     db.query(
         getSessionSQL,
-        [sessionId],
+        [sessionId, req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -795,7 +1023,7 @@ app.post("/sessions/:id/finish", (req, res) => {
 // Session Result Page
 // -------------------------------
 
-app.get("/sessions/:id/result", (req, res) => {
+app.get("/sessions/:id/result",requireLogin, (req, res) => {
 
     const sessionId =
         req.params.id;
@@ -815,11 +1043,12 @@ app.get("/sessions/:id/result", (req, res) => {
             ON sessions.problem_id = problems.id
 
         WHERE sessions.id = ?
+        AND problems.user_id = ?
     `;
 
     db.query(
         sql,
-        [sessionId],
+        [sessionId, req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -884,7 +1113,7 @@ app.get("/sessions/:id/result", (req, res) => {
 // Submit Session Result
 // -------------------------------
 
-app.post("/sessions/:id/result", (req, res) => {
+app.post("/sessions/:id/result",requireLogin, (req, res) => {
 
     const sessionId = req.params.id;
 
@@ -901,17 +1130,20 @@ app.post("/sessions/:id/result", (req, res) => {
     }
 
     const getSessionSQL = `
-        SELECT
-            problem_id,
-            finished_at,
-            result AS current_result
-        FROM sessions
-        WHERE id = ?
-    `;
+    SELECT
+        sessions.problem_id,
+        sessions.finished_at,
+        sessions.result AS current_result
+    FROM sessions
+    JOIN problems
+        ON sessions.problem_id = problems.id
+    WHERE sessions.id = ?
+    AND problems.user_id = ?
+`;
 
     db.query(
         getSessionSQL,
-        [sessionId],
+        [sessionId, req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -1035,22 +1267,25 @@ app.post("/sessions/:id/result", (req, res) => {
 // Expire Session
 // -------------------------------
 
-app.post("/sessions/:id/expire", (req, res) => {
+app.post("/sessions/:id/expire",requireLogin, (req, res) => {
 
     const sessionId = req.params.id;
 
     const getSessionSQL = `
-        SELECT
-            problem_id,
-            finished_at,
-            result
-        FROM sessions
-        WHERE id = ?
-    `;
+    SELECT
+        sessions.problem_id,
+        sessions.finished_at,
+        sessions.result
+    FROM sessions
+    JOIN problems
+        ON sessions.problem_id = problems.id
+    WHERE sessions.id = ?
+    AND problems.user_id = ?
+`;
 
     db.query(
         getSessionSQL,
-        [sessionId],
+        [sessionId, req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -1174,7 +1409,7 @@ app.post("/sessions/:id/expire", (req, res) => {
 // Edit Problem - Form
 // -------------------------------
 
-app.get("/problems/:id/edit", (req, res) => {
+app.get("/problems/:id/edit", requireLogin, (req, res) => {
 
     const { id } =
         req.params;
@@ -1183,11 +1418,12 @@ app.get("/problems/:id/edit", (req, res) => {
         SELECT *
         FROM problems
         WHERE id = ?
+        AND user_id = ?
     `;
 
     db.query(
         sql,
-        [id],
+        [id, req.session.userId],
         (err, results) => {
 
             if (err) {
@@ -1227,7 +1463,7 @@ app.get("/problems/:id/edit", (req, res) => {
 // Update Problem
 // -------------------------------
 
-app.patch("/problems/:id", (req, res) => {
+app.patch("/problems/:id", requireLogin, (req, res) => {
 
     const { id } =
         req.params;
@@ -1253,6 +1489,7 @@ app.patch("/problems/:id", (req, res) => {
             problem_url = ?
 
         WHERE id = ?
+        AND user_id = ?
     `;
 
     db.query(
@@ -1263,7 +1500,8 @@ app.patch("/problems/:id", (req, res) => {
             topic,
             platform,
             problem_url,
-            id
+            id,
+            req.session.userId
         ],
         (err, result) => {
 
@@ -1302,7 +1540,7 @@ app.patch("/problems/:id", (req, res) => {
 // Delete Problem
 // -------------------------------
 
-app.delete("/problems/:id", (req, res) => {
+app.delete("/problems/:id", requireLogin, (req, res) => {
 
     const { id } = req.params;
 
@@ -1328,11 +1566,12 @@ app.delete("/problems/:id", (req, res) => {
             SELECT id
             FROM problems
             WHERE id = ?
+            AND user_id = ?
         `;
 
         db.query(
             checkProblemSQL,
-            [id],
+            [id, req.session.userId],
             (err, results) => {
 
                 if (err) {
@@ -1506,7 +1745,7 @@ app.delete("/problems/:id", (req, res) => {
 // /problems/... routes.
 // ================================
 
-app.get("/problems/:id", (req, res) => {
+app.get("/problems/:id",requireLogin, (req, res) => {
 
     const { id } =
         req.params;
@@ -1520,11 +1759,12 @@ app.get("/problems/:id", (req, res) => {
         SELECT *
         FROM problems
         WHERE id = ?
+        AND user_id = ?
     `;
 
     db.query(
         problemSQL,
-        [id],
+        [id, req.session.userId],
         (err, problemResults) => {
 
             if (err) {
@@ -1630,28 +1870,26 @@ app.get("/problems/:id", (req, res) => {
                     // -------------------------------
 
                     const historySQL = `
-                        SELECT
-
-                            id,
-                            session_type,
-                            started_at,
-                            finished_at,
-                            allowed_minutes,
-                            time_taken_seconds,
-                            result
-
-                        FROM sessions
-
-                        WHERE problem_id = ?
-
-                        AND result IS NOT NULL
-
-                        ORDER BY started_at DESC
-                    `;
+    SELECT
+        sessions.id,
+        sessions.session_type,
+        sessions.started_at,
+        sessions.finished_at,
+        sessions.allowed_minutes,
+        sessions.time_taken_seconds,
+        sessions.result
+    FROM sessions
+    JOIN problems
+        ON sessions.problem_id = problems.id
+    WHERE sessions.problem_id = ?
+    AND problems.user_id = ?
+    AND sessions.result IS NOT NULL
+    ORDER BY sessions.started_at DESC
+`;
 
                     db.query(
                         historySQL,
-                        [id],
+                        [id, req.session.userId],
                         (err, history) => {
 
                             if (err) {

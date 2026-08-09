@@ -1,78 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Completed | DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
-
+  <%- include('partials/head') %>
+  <title>Completed | DSA Focus</title>
 </head>
-
 <body>
 
-    <h1>Completed Problems</h1>
+  <%- include('partials/navbar', { active: 'completed' }) %>
 
-    <p>
-        Total Completed:
-        <strong><%= problems.length %></strong>
-    </p>
+  <div class="page">
 
-    <hr>
+    <div class="section-head">
+      <div>
+        <h1>Completed Problems</h1>
+        <p class="subtitle" style="margin-bottom:0;">Problems you've successfully solved.</p>
+      </div>
+      <div class="stat-card" style="min-width:120px; text-align:center;">
+        <div class="stat-label">Solved</div>
+        <div class="stat-value success"><%= problems.length %></div>
+      </div>
+    </div>
 
     <% if (problems.length === 0) { %>
-
+      <div class="card empty-state" style="margin-top:24px;">
         <p>You haven't completed any problems yet.</p>
-
+        <a href="/problems" class="btn btn-primary">Browse Problems</a>
+      </div>
     <% } else { %>
-
+      <div class="problem-list" style="margin-top:24px;">
         <% problems.forEach(problem => { %>
-
-            <div>
-
-                <h2>
-                    <a href="/problems/<%= problem.id %>">
-                        <%= problem.title %>
-                    </a>
-                </h2>
-
-                <p>
-                    Difficulty:
-                    <%= problem.difficulty %>
-                </p>
-
-                <p>
-                    Topic:
-                    <%= problem.topic || "Not specified" %>
-                </p>
-
-                <p>
-                    Platform:
-                    <%= problem.platform || "Not specified" %>
-                </p>
-
-                <p>
-                    Status:
-                    <strong>Completed</strong>
-                </p>
-
+          <a href="/problems/<%= problem.id %>" class="card card-link problem-card">
+            <div class="problem-main">
+              <div class="problem-title-row">
+                <h3><%= problem.title %></h3>
+                <span class="status-pill status-completed"><span class="status-dot"></span>Completed</span>
+              </div>
+              <div class="tag-row">
+                <span class="tag tag-<%= problem.difficulty %>"><%= problem.difficulty %></span>
+                <span class="tag tag-plain"><%= problem.topic || "General" %></span>
+                <span class="tag tag-plain"><%= problem.platform || "—" %></span>
+              </div>
             </div>
-
-            <hr>
-
+          </a>
         <% }) %>
-
+      </div>
     <% } %>
 
-    <a href="/problems">
-        ← Back to Problems
-    </a>
+  </div>
 
 </body>
-
 </html>

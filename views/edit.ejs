@@ -1,146 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Edit Problem | DSA Focus</title>
-
-    <link rel="stylesheet" href="/style.css">
-
+  <%- include('partials/head') %>
+  <title>Edit Problem | DSA Focus</title>
 </head>
-
 <body>
 
+  <%- include('partials/navbar', { active: 'problems' }) %>
+
+  <div class="page page--focus">
+
     <h1>Edit Problem</h1>
+    <p class="subtitle">Update the details for <%= problem.title %>.</p>
 
-    <form action="/problems/<%= problem.id %>?_method=PATCH"
-          method="POST">
+    <div class="card form-card">
+      <form action="/problems/<%= problem.id %>?_method=PATCH" method="POST">
 
-        <div>
-
-            <label for="title">
-                Problem Title
-            </label>
-
-            <input
-                type="text"
-                id="title"
-                name="title"
-                value="<%= problem.title %>"
-                required
-            >
-
+        <div class="field">
+          <label for="title">Problem Title</label>
+          <input type="text" id="title" name="title" value="<%= problem.title %>" required>
         </div>
 
-        <br>
-
-        <div>
-
-            <label for="difficulty">
-                Difficulty
-            </label>
-
-            <select
-                id="difficulty"
-                name="difficulty"
-                required
-            >
-
-                <option
-                    value="easy"
-                    <%= problem.difficulty === "easy" ? "selected" : "" %>
-                >
-                    Easy
-                </option>
-
-                <option
-                    value="medium"
-                    <%= problem.difficulty === "medium" ? "selected" : "" %>
-                >
-                    Medium
-                </option>
-
-                <option
-                    value="hard"
-                    <%= problem.difficulty === "hard" ? "selected" : "" %>
-                >
-                    Hard
-                </option>
-
-            </select>
-
+        <div class="field">
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty" name="difficulty" required>
+            <option value="easy" <%= problem.difficulty === "easy" ? "selected" : "" %>>Easy</option>
+            <option value="medium" <%= problem.difficulty === "medium" ? "selected" : "" %>>Medium</option>
+            <option value="hard" <%= problem.difficulty === "hard" ? "selected" : "" %>>Hard</option>
+          </select>
         </div>
 
-        <br>
-
-        <div>
-
-            <label for="topic">
-                Topic
-            </label>
-
-            <input
-                type="text"
-                id="topic"
-                name="topic"
-                value="<%= problem.topic || '' %>"
-            >
-
+        <div class="field">
+          <label for="topic">Topic</label>
+          <input type="text" id="topic" name="topic" value="<%= problem.topic || '' %>">
         </div>
 
-        <br>
-
-        <div>
-
-            <label for="platform">
-                Platform
-            </label>
-
-            <input
-                type="text"
-                id="platform"
-                name="platform"
-                value="<%= problem.platform || '' %>"
-            >
-
+        <div class="field">
+          <label for="platform">Platform</label>
+          <input type="text" id="platform" name="platform" value="<%= problem.platform || '' %>">
         </div>
 
-        <br>
-
-        <div>
-
-            <label for="problem_url">
-                Problem URL
-            </label>
-
-            <input
-                type="url"
-                id="problem_url"
-                name="problem_url"
-                value="<%= problem.problem_url || '' %>"
-            >
-
+        <div class="field" style="margin-bottom:26px;">
+          <label for="problem_url">Problem URL</label>
+          <input type="url" id="problem_url" name="problem_url" value="<%= problem.problem_url || '' %>">
         </div>
 
-        <br>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary">Update Problem</button>
+          <a href="/problems/<%= problem.id %>" class="btn btn-ghost">Cancel</a>
+        </div>
 
-        <button type="submit">
-            Update Problem
-        </button>
+      </form>
+    </div>
 
-    </form>
-
-    <br>
-
-    <a href="/problems/<%= problem.id %>">
-        Cancel
-    </a>
+  </div>
 
 </body>
-
 </html>
