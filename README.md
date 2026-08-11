@@ -335,22 +335,6 @@ The application has been tested for major user flows including:
 
 ---
 
-## 📸 Screenshots
-
-### Dashboard
-_Add dashboard screenshot here._
-
-### Problem Practice
-_Add problem/timer screenshot here._
-
-### Attempt History
-_Add attempt history screenshot here._
-
-### Authentication
-_Add login/register screenshot here._
-
----
-
 ## 🔮 Future Improvements
 
 Planned improvements include:
