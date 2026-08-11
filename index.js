@@ -286,10 +286,8 @@ app.post("/logout", (req, res) => {
 });
 
 
-// ================================
-// HOME
-// ================================
 
+//home
 app.get("/", (req, res) => {
 
     res.render("home");
@@ -297,14 +295,7 @@ app.get("/", (req, res) => {
 });
 
 
-// ================================
-// PROBLEM ROUTES
-// ================================
-
-
-// -------------------------------
-// Add New Problem - Form
-// -------------------------------
+//problem routes-
 
 app.get("/problems/new",requireLogin, (req, res) => {
 
@@ -313,9 +304,7 @@ app.get("/problems/new",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Create New Problem
-// -------------------------------
+//new problems
 
 app.post("/problems",requireLogin, (req, res) => {
 
@@ -336,18 +325,12 @@ app.post("/problems",requireLogin, (req, res) => {
     problem_url = problem_url ? problem_url.trim() : "";
 
 
-    // -------------------------------
-    // Validate title
-    // -------------------------------
 
     if (!title) {
         return res.status(400).send("Problem title is required");
     }
 
 
-    // -------------------------------
-    // Validate difficulty
-    // -------------------------------
 
     const validDifficulties = [
         "easy",
@@ -361,10 +344,6 @@ app.post("/problems",requireLogin, (req, res) => {
         );
     }
 
-
-    // -------------------------------
-    // Validate URL
-    // -------------------------------
 
     if (problem_url) {
 
@@ -381,11 +360,6 @@ app.post("/problems",requireLogin, (req, res) => {
         }
 
     }
-
-
-    // -------------------------------
-    // Insert into database
-    // -------------------------------
 
     const sql = `
         INSERT INTO problems
@@ -440,10 +414,6 @@ app.post("/problems",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Completed Problems
-// IMPORTANT: Before /problems/:id
-// -------------------------------
 
 app.get("/problems/completed",requireLogin, (req, res) => {
 
@@ -478,11 +448,6 @@ app.get("/problems/completed",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Revision Problems
-// IMPORTANT: Before /problems/:id
-// -------------------------------
-
 app.get("/problems/revision", requireLogin, (req, res) => {
 
     const sql = `
@@ -516,15 +481,8 @@ app.get("/problems/revision", requireLogin, (req, res) => {
 });
 
 
-// ================================
-// DASHBOARD
-// ================================
 
 app.get("/dashboard",requireLogin, (req, res) => {
-
-    // -------------------------------
-    // Overview
-    // -------------------------------
 
     const overviewSQL = `
         SELECT
@@ -569,10 +527,6 @@ app.get("/dashboard",requireLogin, (req, res) => {
             const overview =
                 overviewResults[0];
 
-
-            // -------------------------------
-            // Attempt Statistics
-            // -------------------------------
 
             const attemptsSQL = `
                 SELECT
@@ -660,10 +614,6 @@ app.get("/dashboard",requireLogin, (req, res) => {
                             averageTime % 60
                         );
 
-
-                    // -------------------------------
-                    // Recent Activity
-                    // -------------------------------
 
                     const recentSQL = `
                         SELECT
@@ -763,15 +713,8 @@ app.get("/dashboard",requireLogin, (req, res) => {
 });
 
 
-// ================================
-// SESSION ROUTES
-// ================================
 
-
-// -------------------------------
-// Start Solving
-// -------------------------------
-
+//SESSION rOUTES
 app.get("/problems/:id/start",requireLogin, (req, res) => {
 
     const { id } = req.params;
@@ -825,10 +768,6 @@ app.get("/problems/:id/start",requireLogin, (req, res) => {
                 results[0];
 
 
-            // -------------------------------
-            // Determine Timer
-            // -------------------------------
-
             let allowedMinutes;
 
             if (
@@ -851,10 +790,6 @@ app.get("/problems/:id/start",requireLogin, (req, res) => {
 
             }
 
-
-            // -------------------------------
-            // Create Session
-            // -------------------------------
 
             const createSessionSQL = `
                 INSERT INTO sessions
@@ -915,9 +850,7 @@ app.get("/problems/:id/start",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Finish Session
-// -------------------------------
+//FINAL SESSION
 
 app.post("/sessions/:id/finish",requireLogin, (req, res) => {
 
@@ -1025,9 +958,8 @@ app.post("/sessions/:id/finish",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Session Result Page
-// -------------------------------
+
+//result page
 
 app.get("/sessions/:id/result",requireLogin, (req, res) => {
 
@@ -1115,9 +1047,7 @@ app.get("/sessions/:id/result",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Submit Session Result
-// -------------------------------
+//session result
 
 app.post("/sessions/:id/result",requireLogin, (req, res) => {
 
@@ -1269,9 +1199,7 @@ app.post("/sessions/:id/result",requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Expire Session
-// -------------------------------
+
 
 app.post("/sessions/:id/expire",requireLogin, (req, res) => {
 
@@ -1406,14 +1334,6 @@ app.post("/sessions/:id/expire",requireLogin, (req, res) => {
 });
 
 
-// ================================
-// EDIT PROBLEM
-// ================================
-
-
-// -------------------------------
-// Edit Problem - Form
-// -------------------------------
 
 app.get("/problems/:id/edit", requireLogin, (req, res) => {
 
@@ -1465,9 +1385,7 @@ app.get("/problems/:id/edit", requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Update Problem
-// -------------------------------
+
 
 app.patch("/problems/:id", requireLogin, (req, res) => {
 
@@ -1542,9 +1460,7 @@ app.patch("/problems/:id", requireLogin, (req, res) => {
 });
 
 
-// -------------------------------
-// Delete Problem
-// -------------------------------
+
 
 app.delete("/problems/:id", requireLogin, (req, res) => {
 
@@ -1564,9 +1480,6 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
         }
 
 
-        // --------------------------------
-        // Step 1: Check if problem exists
-        // --------------------------------
 
         const checkProblemSQL = `
             SELECT id
@@ -1611,9 +1524,6 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
                 }
 
 
-                // --------------------------------
-                // Step 2: Delete sessions
-                // --------------------------------
 
                 const deleteSessionsSQL = `
                     DELETE FROM sessions
@@ -1644,10 +1554,6 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
 
                         }
 
-
-                        // --------------------------------
-                        // Step 3: Delete problem
-                        // --------------------------------
 
                         const deleteProblemSQL = `
                             DELETE FROM problems
@@ -1696,9 +1602,6 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
                                 }
 
 
-                                // --------------------------------
-                                // Step 4: Commit
-                                // --------------------------------
 
                                 db.commit((err) => {
 
@@ -1722,8 +1625,6 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
                                     }
 
 
-                                    // Everything succeeded
-
                                     res.redirect(
                                         "/problems"
                                     );
@@ -1744,22 +1645,13 @@ app.delete("/problems/:id", requireLogin, (req, res) => {
 });
 
 
-// ================================
-// INDIVIDUAL PROBLEM
-// IMPORTANT:
-// This MUST come after all specific
-// /problems/... routes.
-// ================================
 
+//individail problem
 app.get("/problems/:id",requireLogin, (req, res) => {
 
     const { id } =
         req.params;
 
-
-    // -------------------------------
-    // Get Problem
-    // -------------------------------
 
     const problemSQL = `
         SELECT *
@@ -1799,10 +1691,6 @@ app.get("/problems/:id",requireLogin, (req, res) => {
             const problem =
                 problemResults[0];
 
-
-            // -------------------------------
-            // Statistics
-            // -------------------------------
 
             const statsSQL = `
                 SELECT
@@ -1870,10 +1758,6 @@ app.get("/problems/:id",requireLogin, (req, res) => {
                     const stats =
                         statsResults[0];
 
-
-                    // -------------------------------
-                    // Attempt History
-                    // -------------------------------
 
                     const historySQL = `
     SELECT
@@ -1955,9 +1839,6 @@ app.use((err, req, res, next) => {
 
 
 
-// ================================
-// START SERVER
-// ================================
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
