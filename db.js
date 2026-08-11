@@ -12,7 +12,9 @@ const dbConfig = {
 
 if (process.env.NODE_ENV === "production") {
     dbConfig.ssl = {
-        ca: process.env.DB_SSL_CA,
+        ca: process.env.DB_SSL_CA
+            ? process.env.DB_SSL_CA.replace(/\\n/g, "\n")
+            : undefined,
         rejectUnauthorized: true
     };
 }
